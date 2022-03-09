@@ -9,26 +9,52 @@ class Sumcoin(commands.Cog):
         self._last_member = None
     
     @commands.command()
-    async def test(self,ctx,message_id):
+    async def test(self,ctx,message_id,limit_num):
+        
+        if int(ctx.author.id) != 535752156947677195:
+            print("管理者以外の実行")
+            return
+
         await ctx.channel.send("読み込み中")
+        
         l = []
-        async for message in ctx.channel.history():
+        
+        async for message in ctx.channel.history(limit=int(limit_num)+2):
+
             l.append(message)
+            
             if message.id == int(message_id):
                 break
         
+        if len(l) == int(limit_num):
+            await ctx.channel.send("メッセージを取得できませんでした。\n__取得したメッセージのリスト__")
+            await ctx.channel.send("\n".join([m.content for m in l]))
+            return
+
+        await ctx.channel.send("{}件のメッセージを取得しました".format(len(l)))
+
         with open("databox/user_data.json","r") as f:
             d = json.load(f)
         
         for i in l:
+                        
+            if "k!" in i.content or i.author.bot:
+                continue
+            print(i.content)
+            num = re.search(r"[0-9]+",i.content)
+            if num == None:
+                continue
 
-            if str(i.author.id) in d:
-                d[str(i.author.id)] += 1
+            elif str(i.author.id) in d:
+                d[str(i.author.id)] += int(num.group())
+            
             else:
-                d[str(i.author.id)] = 0
+                d[str(i.author.id)] = int(num.group())
+
         with open("databox/user_data.json","w") as f:
-            json.dump(d,f)
-        await ctx.channel.send(str(len([m.content for m in l])))
+            json.dump(d,f,indent=2)
+
+        await ctx.channel.send("\n".join([m.content for m in l]))
         
         #msg = discord.utils.get([message async for message in ctx.channel.history()],)
         
