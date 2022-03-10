@@ -9,10 +9,10 @@ class Sumcoin(commands.Cog):
         self._last_member = None
     
     @commands.command()
-    async def test(self,ctx,message_id,limit_num):
+    async def cal_ch_num(self,ctx,message_id,limit_num):
         
         if int(ctx.author.id) != 535752156947677195:
-            print("管理者以外の実行")
+            await ctx.channel.send("管理者以外の実行")
             return
 
         await ctx.channel.send("読み込み中")
@@ -40,7 +40,6 @@ class Sumcoin(commands.Cog):
                         
             if "k!" in i.content or i.author.bot:
                 continue
-            print(i.content)
             num = re.search(r"[0-9]+",i.content)
             if num == None:
                 continue
@@ -53,18 +52,46 @@ class Sumcoin(commands.Cog):
 
         with open("databox/user_data.json","w") as f:
             json.dump(d,f,indent=2)
-
-        await ctx.channel.send("\n".join([m.content for m in l]))
-        
-        #msg = discord.utils.get([message async for message in ctx.channel.history()],)
-        
-        #if msg == None:
-        #   await ctx.channel.send("何もありませんでした")
-        #else:
-        #    await ctx.channel.send(msg)
-        #l = [message.content async for message in ctx.channel.history(limit=50)]
-        #l = len("".join(l))
-        #await ctx.channel.send(str(l))
+        await ctx.channel.send("処理を終了しました")
+        try:
+            await ctx.channel.send("__取得したメッセージリスト__\n```{}```".format("\n".join([m.content for m in l])))
+        except:
+            await ctx.channel.send("取得した中で最も古いメッセージ\n{}".format(l[-1].content))
+    @commands.command()    
+    async def set_num(self,ctx,user_id,num):
+        if int(ctx.author.id) != 535752156947677195:
+            await ctx.channel.send("管理者以外の実行")
+            return
+        with open("databox/user_data.json","r") as f:
+            d = json.load(f)
+        d[str(user_id)] = int(num)
+        with open("databox/user_data.json","w") as f:
+            json.dump(d,f,indent=2)
+        await ctx.channel.send("設定しました")
     
+    @commands.command()
+    async def look_num(self,ctx,user_id=None):
+        if int(ctx.author.id) != 535752156947677195:
+            await ctx.channel.send("管理者以外の実行")
+            return
+        with open("databox/user_data.json","r") as f:
+            d = json.load(f)
+        
+        if user_id == None:
+            await ctx.channel.send("```json\n{}```".format(str(d)))
+        else:
+            await ctx.channel.send(str(d[str(user_id)]))
+    
+    @commands.command()
+    async def name_list(self,ctx):
+        if int(ctx.author.id) != 535752156947677195:
+            await ctx.channel.send("管理者以外の実行")
+            return
+        with open("databox/user_data.json","r") as f:
+            d = json.load(f)
+        for i in d.keys():
+            user = discord.get_user(int(i))
+            await ctx.channel.send("{}:{}".format(user.name,d[str(i)]))
+
 def setup(bot):
     return bot.add_cog(Sumcoin(bot))
