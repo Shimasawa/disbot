@@ -1,14 +1,12 @@
 import discord
 from discord.ext import commands
 
-import json
+import os
+from dotenv import load_dotenv
 
 
-
-with open("databox/token.json","r") as f:
-    token_json = json.load(f)
-
-TOKEN = token_json["TOKEN"]
+load_dotenv(override=True)
+TOKEN = os.getenv("TOKEN")
 intents = discord.Intents.default()
 
 bot = commands.Bot(command_prefix="k!",intents=intents)
