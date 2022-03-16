@@ -15,6 +15,6 @@ bot = commands.Bot(command_prefix="k!",intents=intents)
 files = [file[:-3] for file in os.listdir("Cogs") if file.endswith(".py")]
 
 for filename in files:
-    bot.load_extension("Cogs."+filename)
+    bot.load_extension(f"Cogs.{filename}")
 
 bot.run(TOKEN)

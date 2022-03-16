@@ -118,11 +118,13 @@ class Sumcoin(commands.Cog):
         )
         embed.add_field(
             name="set_num",
-            value="引数（ユーザーid,数字）\n指定されたユーザーの数字を指定された数字に設定します",            inline=False
+            value="引数（ユーザーid,数字）\n指定されたユーザーの数字を指定された数字に設定します",
+            inline=False
         )
         embed.add_field(
             name="look_num",
-            value="引数（ユーザーid(デフォルト=None)）\n指定されたユーザーの所持金を表示します。引数を指定しなかった場合、保存中の辞書データをそのまま出力します",            inline=False
+            value="引数（ユーザーid(デフォルト=None)）\n指定されたユーザーの所持金を表示します。引数を指定しなかった場合、保存中の辞書データをそのまま出力します",
+            inline=False
         )
         embed.add_field(
             name="name_list",
