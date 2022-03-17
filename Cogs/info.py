@@ -9,7 +9,7 @@ class Bot_info(commands.Cog):
 
     @commands.command()
     async def info(self,ctx):
-        """ヘルプコマンドを表示する"""
+        """詳細なヘルプコマンドを表示する"""
         embed = discord.Embed(
             title="黒影-info-",
             description="「黒影」は、メンバーごとに数値を設定することができるbotです。\n__β版につき、全てのコマンドは管理者のみ実行可能__",
