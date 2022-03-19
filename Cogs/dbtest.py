@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-import sqlite3
+import aiosqlite
 
 class testSqlite3(commands.Cog):
     def __init__(self,bot):
@@ -9,18 +9,26 @@ class testSqlite3(commands.Cog):
         self._last_member = None
     
     @commands.command()
-    async def memo(self,ctx,mode,num1,num2):
-        con = sqlite3.connect("databox/coin.db")
-        c = con.cursor()
-        if mode == "add":
-            #c.execute("CREATE TABLE test(userid NUMERIC,num NUMERIC)")
-            c.execute(f"insert into test values ({int(num1)},{int(num2)})")
-            con.commit()
-        if mode == "view":
-            c.execute(f"select * FROM test WHERE userid = {int(num1)}")
-            print([i[1] for i in c.fetchall()])
-            await ctx.channel.send("\n".join([str(i[1]) for i in c.fetchall()]))
-        con.close()
+    async def testsql(self,ctx,sql):
+        try:
+            async with aiosqlite.connect("databox/coin.db") as db:
+                await db.execute(sql)
+                await db.commit()
+                await ctx.channel.send("データベースに反映しました")
+        except:
+            await ctx.channel.send("何らかのエラーが発生したため実行できませんでした")
+
+    @commands.command()
+    async def printsql(self,ctx,sql):
+        try:
+            async with aiosqlite.connect("databox/coin.db") as db:
+                async with db.execute(sql) as cursor:
+                    for i in await cursor.fetchall():
+                        print(i)
+                        await ctx.channel.send(str(list(i)))
+
+        except:
+            await ctx.channel.send("何らかのエラーが発生したため実行できませんでした")
 
 
 
