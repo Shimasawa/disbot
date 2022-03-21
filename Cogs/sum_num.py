@@ -2,6 +2,7 @@ import json
 import discord
 from discord.ext import commands
 import re
+import aiosqlite
 
 class Sumcoin(commands.Cog):
     def __init__(self,bot):
@@ -32,26 +33,25 @@ class Sumcoin(commands.Cog):
             return
 
         await ctx.channel.send("{}件のメッセージを取得しました".format(len(l)))
-
-        with open("databox/user_data.json","r") as f:
-            d = json.load(f)
-        
+            
         for i in l:
-                        
+                            
             if "k!" in i.content or i.author.bot:
                 continue
             num = re.search(r"[0-9]+",i.content)
             if num == None:
                 continue
+            async with aiosqlite.connect(r"databox/main.db") as db:
+                cursor = await db.execute(f"select num from coin where user_id = {int(i.author.id)}")
+                coin = await cursor.fetchone()
+                print(coin)
+                if coin == None:
+                    await db.execute(f"insert into coin(user_id,num) values({int(i.author.id)},{int(num.group())})")
+                else:
+                    coin = coin[0] + int(num.group())
+                    await db.execute(f"update coin set num = {coin} where user_id = {int(i.author.id)}")
+                await db.commit()
 
-            elif str(i.author.id) in d:
-                d[str(i.author.id)] += int(num.group())
-            
-            else:
-                d[str(i.author.id)] = int(num.group())
-
-        with open("databox/user_data.json","w") as f:
-            json.dump(d,f,indent=2)
         await ctx.channel.send("処理を終了しました")
         try:
             await ctx.channel.send("__取得したメッセージリスト__\n```{}```".format("\n".join([m.content for m in l])))

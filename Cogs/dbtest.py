@@ -11,7 +11,7 @@ class testSqlite3(commands.Cog):
     @commands.command()
     async def testsql(self,ctx,sql):
         try:
-            async with aiosqlite.connect("databox/coin.db") as db:
+            async with aiosqlite.connect("databox/main.db") as db:
                 await db.execute(sql)
                 await db.commit()
                 await ctx.channel.send("データベースに反映しました")
@@ -21,11 +21,13 @@ class testSqlite3(commands.Cog):
     @commands.command()
     async def printsql(self,ctx,sql):
         try:
-            async with aiosqlite.connect("databox/coin.db") as db:
+            async with aiosqlite.connect("databox/main.db") as db:
                 async with db.execute(sql) as cursor:
-                    for i in await cursor.fetchall():
-                        print(i)
-                        await ctx.channel.send(str(list(i)))
+                    a = await cursor.fetchall()
+
+                    a = [i[0] for i in a]
+
+                    await ctx.channel.send(str(a))
 
         except:
             await ctx.channel.send("何らかのエラーが発生したため実行できませんでした")
